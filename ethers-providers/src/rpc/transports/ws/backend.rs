@@ -4,7 +4,7 @@ use futures_util::{select, sink::SinkExt, stream::StreamExt, FutureExt};
 use serde_json::value::RawValue;
 
 use super::{types::*, WsClientError};
-use tracing::{error, trace};
+use tracing::error;
 
 /// `BackendDriver` drives a specific `WsBackend`. It can be used to issue
 /// requests, receive responses, see errors, and shut down the backend.
@@ -92,13 +92,11 @@ impl WsBackend {
     }
 
     pub async fn handle_text(&mut self, t: String) -> Result<(), WsClientError> {
-        trace!(text = t, "Received message");
         match serde_json::from_str(&t) {
             Ok(item) => {
-                trace!(%item, "Deserialized message");
                 let res = self.handler.unbounded_send(item);
                 if res.is_err() {
-                    return Err(WsClientError::DeadChannel)
+                    return Err(WsClientError::DeadChannel);
                 }
             }
             Err(e) => {

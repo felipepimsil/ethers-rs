@@ -79,7 +79,7 @@ impl SubscriptionManager {
                     channel,
                 };
                 // reuse the RPC ID. this is somewhat dirty.
-                return unsub_request.serialize_raw(id).ok()
+                return unsub_request.serialize_raw(id).ok();
             }
             tracing::trace!("No current server id");
         }
@@ -98,7 +98,7 @@ impl SubscriptionManager {
                 server_id = format!("0x{server_id:x}"),
                 "No aliased subscription found"
             );
-            return
+            return;
         }
         let id = id_opt.unwrap();
 
@@ -324,7 +324,7 @@ impl RequestManager {
 
     async fn reconnect(&mut self) -> Result<(), WsClientError> {
         if self.reconnects == 0 {
-            return Err(WsClientError::TooManyReconnects)
+            return Err(WsClientError::TooManyReconnects);
         }
         self.reconnects -= 1;
 
@@ -422,7 +422,7 @@ impl RequestManager {
 
         // Ordering matters here. We want this block above the unbounded send,
         // and after the serialization
-        if in_flight.method == "eth_subscribe" {
+        if in_flight.method == "eth_subscribe" || in_flight.method == "subscribe" {
             self.subs.service_subscription_request(id, in_flight.params.clone())?;
         }
 
